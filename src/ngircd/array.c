@@ -72,7 +72,9 @@ typedef __nlink_t nlink_t;
 typedef __uid_t uid_t;
 typedef __off_t off_t;
 typedef __pid_t pid_t;
+typedef __id_t id_t;
 typedef __ssize_t ssize_t;
+typedef __clock_t clock_t;
 typedef __clockid_t clockid_t;
 typedef __time_t time_t;
 typedef __timer_t timer_t;
@@ -86,9 +88,130 @@ typedef __uint16_t u_int16_t;
 typedef __uint32_t u_int32_t;
 typedef __uint64_t u_int64_t;
 typedef signed int register_t __attribute__((__mode__(__word__)));
+typedef __blksize_t blksize_t;
 typedef __blkcnt_t blkcnt_t;
 typedef __fsblkcnt_t fsblkcnt_t;
 typedef __fsfilcnt_t fsfilcnt_t;
+typedef struct __pthread_internal_list {
+  struct __pthread_internal_list  *__prev;
+  struct __pthread_internal_list  *__next;
+  
+} __pthread_list_t;
+typedef struct __pthread_internal_slist {
+  struct __pthread_internal_slist  *__next;
+  
+} __pthread_slist_t;
+struct __pthread_mutex_s {
+  signed int __lock;
+  unsigned int __count;
+  signed int __owner;
+  unsigned int __nusers;
+  signed int __kind;
+  signed short __spins;
+  signed short __elision;
+  __pthread_list_t __list;
+  
+};
+struct __pthread_rwlock_arch_t {
+  unsigned int __readers;
+  unsigned int __writers;
+  unsigned int __wrphase_futex;
+  unsigned int __writers_futex;
+  unsigned int __pad3;
+  unsigned int __pad4;
+  signed int __cur_writer;
+  signed int __shared;
+  char __rwelision;
+  unsigned char __pad1[7];
+  unsigned long __pad2;
+  unsigned int __flags;
+  
+};
+struct __pthread_cond_s {
+  union  {
+    unsigned long long __wseq;
+    struct anon__usr_include_bits_thread_shared_types_h_97_4 {
+      unsigned int __low;
+      unsigned int __high;
+      
+    } __wseq32;
+    
+  };
+  union  {
+    unsigned long long __g1_start;
+    struct anon__usr_include_bits_thread_shared_types_h_106_4 {
+      unsigned int __low;
+      unsigned int __high;
+      
+    } __g1_start32;
+    
+  };
+  unsigned int __g_refs[2];
+  unsigned int __g_size[2];
+  unsigned int __g1_orig_size;
+  unsigned int __wrefs;
+  unsigned int __g_signals[2];
+  
+};
+typedef unsigned int __tss_t;
+typedef unsigned long __thrd_t;
+typedef struct anon__usr_include_bits_thread_shared_types_h_122_8 {
+  signed int __data;
+  
+} __once_flag;
+typedef unsigned long pthread_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_32_8 {
+  char __size[4];
+  signed int __align;
+  
+} pthread_mutexattr_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_41_8 {
+  char __size[4];
+  signed int __align;
+  
+} pthread_condattr_t;
+typedef unsigned int pthread_key_t;
+typedef signed int pthread_once_t;
+union pthread_attr_t {
+  char __size[56];
+  signed long __align;
+  
+};
+typedef union pthread_attr_t pthread_attr_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_67_8 {
+  struct __pthread_mutex_s __data;
+  char __size[40];
+  signed long __align;
+  
+} pthread_mutex_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_75_8 {
+  struct __pthread_cond_s __data;
+  char __size[48];
+  signed long long __align;
+  
+} pthread_cond_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_86_8 {
+  struct __pthread_rwlock_arch_t __data;
+  char __size[56];
+  signed long __align;
+  
+} pthread_rwlock_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_93_8 {
+  char __size[8];
+  signed long __align;
+  
+} pthread_rwlockattr_t;
+typedef volatile signed int pthread_spinlock_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_108_8 {
+  char __size[32];
+  signed long __align;
+  
+} pthread_barrier_t;
+typedef union anon__usr_include_bits_pthreadtypes_h_114_8 {
+  char __size[4];
+  signed int __align;
+  
+} pthread_barrierattr_t;
 typedef signed long ptrdiff_t;
 typedef signed int wchar_t;
 typedef struct anon__usr_lib_gcc_x86_64_pc_linux_gnu_11_2_1_include_stddef_h_415_8 {
@@ -138,7 +261,7 @@ typedef uint16_t UINT16;
 typedef uint32_t UINT32;
 extern size_t strlcat(char  * dst, const char  * src, size_t  size);
 extern size_t strlcpy(char  * dst, const char  * src, size_t  size);
-typedef struct anon___src_ngircd_array_h_22_8 {
+typedef struct anon_array_h_22_8 {
   char  *mem;
   size_t allocated;
   size_t used;
@@ -191,10 +314,12 @@ extern signed long long strtoll(const char  *__restrict  __nptr, char  * *__rest
 extern unsigned long long strtoull(const char  *__restrict  __nptr, char  * *__restrict  __endptr, signed int  __base) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 extern signed int rand(void) __attribute__((__nothrow__, __leaf__));
 extern void srand(unsigned int  __seed) __attribute__((__nothrow__, __leaf__));
+extern signed int rand_r(unsigned int  * __seed) __attribute__((__nothrow__, __leaf__));
 extern void  *malloc(size_t  __size) __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__)) __attribute__((__alloc_size__(1)));
 extern void  *calloc(size_t  __nmemb, size_t  __size) __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__)) __attribute__((__alloc_size__(1, 2)));
 extern void  *realloc(void  * __ptr, size_t  __size) __attribute__((__nothrow__, __leaf__)) __attribute__((__warn_unused_result__)) __attribute__((__alloc_size__(2)));
 extern void free(void  * __ptr) __attribute__((__nothrow__, __leaf__));
+extern signed int posix_memalign(void  * * __memptr, size_t  __alignment, size_t  __size) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 extern void  *aligned_alloc(size_t  __alignment, size_t  __size) __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__)) __attribute__((__alloc_size__(2)));
 extern void abort(void) __attribute__((__nothrow__, __leaf__)) __attribute__((__noreturn__));
 extern signed int atexit(void ( * __func)(void)) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
@@ -203,6 +328,10 @@ extern void exit(signed int  __status) __attribute__((__nothrow__, __leaf__)) __
 extern void quick_exit(signed int  __status) __attribute__((__nothrow__, __leaf__)) __attribute__((__noreturn__));
 extern void _Exit(signed int  __status) __attribute__((__nothrow__, __leaf__)) __attribute__((__noreturn__));
 extern char  *getenv(const char  * __name) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int setenv(const char  * __name, const char  * __value, signed int  __replace) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
+extern signed int unsetenv(const char  * __name) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int mkstemp(char  * __template) __attribute__((__nonnull__(1)));
+extern char  *mkdtemp(char  * __template) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 extern signed int system(const char  * __command);
 typedef signed int ( *__compar_fn_t)(const void  * , const void  * );
 extern void  *bsearch(const void  * __key, const void  * __base, size_t  __nmemb, size_t  __size, __compar_fn_t  __compar) __attribute__((__nonnull__(1, 2, 5)));
@@ -218,6 +347,148 @@ extern signed int mbtowc(wchar_t  *__restrict  __pwc, const char  *__restrict  _
 extern signed int wctomb(char  * __s, wchar_t  __wchar) __attribute__((__nothrow__, __leaf__));
 extern size_t mbstowcs(wchar_t  *__restrict  __pwcs, const char  *__restrict  __s, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__access__(__read_only__, 2)));
 extern size_t wcstombs(char  *__restrict  __s, const wchar_t  *__restrict  __pwcs, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__access__(__write_only__, 1, 3))) __attribute__((__access__(__read_only__, 2)));
+extern signed int getsubopt(char  * *__restrict  __optionp, char  *const  *__restrict  __tokens, char  * *__restrict  __valuep) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2, 3)));
+typedef __builtin_va_list __gnuc_va_list;
+typedef struct anon__usr_include_bits_types___mbstate_t_h_13_8 {
+  signed int __count;
+  union anon__usr_include_bits_types___mbstate_t_h_16_2 {
+    unsigned int __wch;
+    char __wchb[4];
+    
+  } __value;
+  
+} __mbstate_t;
+typedef struct _G_fpos_t {
+  __off_t __pos;
+  __mbstate_t __state;
+  
+} __fpos_t;
+typedef struct _G_fpos64_t {
+  __off64_t __pos;
+  __mbstate_t __state;
+  
+} __fpos64_t;
+struct _IO_FILE;
+typedef struct _IO_FILE __FILE;
+struct _IO_FILE;
+typedef struct _IO_FILE FILE;
+struct _IO_FILE;
+struct _IO_marker;
+struct _IO_codecvt;
+struct _IO_wide_data;
+typedef void _IO_lock_t;
+struct _IO_FILE {
+  signed int _flags;
+  char  *_IO_read_ptr;
+  char  *_IO_read_end;
+  char  *_IO_read_base;
+  char  *_IO_write_base;
+  char  *_IO_write_ptr;
+  char  *_IO_write_end;
+  char  *_IO_buf_base;
+  char  *_IO_buf_end;
+  char  *_IO_save_base;
+  char  *_IO_backup_base;
+  char  *_IO_save_end;
+  struct _IO_marker  *_markers;
+  struct _IO_FILE  *_chain;
+  signed int _fileno;
+  signed int _flags2;
+  __off_t _old_offset;
+  unsigned short _cur_column;
+  char _vtable_offset;
+  char _shortbuf[1];
+  _IO_lock_t  *_lock;
+  __off64_t _offset;
+  struct _IO_codecvt  *_codecvt;
+  struct _IO_wide_data  *_wide_data;
+  struct _IO_FILE  *_freeres_list;
+  void  *_freeres_buf;
+  size_t __pad5;
+  signed int _mode;
+  char _unused2[(((15 * (sizeof(signed int))) - (4 * (sizeof(void *)))) - (sizeof(size_t)))];
+  
+};
+typedef __gnuc_va_list va_list;
+typedef __fpos_t fpos_t;
+extern FILE  *stdin;
+extern FILE  *stdout;
+extern FILE  *stderr;
+extern signed int remove(const char  * __filename) __attribute__((__nothrow__, __leaf__));
+extern signed int rename(const char  * __old, const char  * __new) __attribute__((__nothrow__, __leaf__));
+extern signed int renameat(signed int  __oldfd, const char  * __old, signed int  __newfd, const char  * __new) __attribute__((__nothrow__, __leaf__));
+extern FILE  *tmpfile(void);
+extern char  *tmpnam(char  * __s) __attribute__((__nothrow__, __leaf__));
+extern signed int fclose(FILE  * __stream);
+extern signed int fflush(FILE  * __stream);
+extern FILE  *fopen(const char  *__restrict  __filename, const char  *__restrict  __modes);
+extern FILE  *freopen(const char  *__restrict  __filename, const char  *__restrict  __modes, FILE  *__restrict  __stream);
+extern FILE  *fdopen(signed int  __fd, const char  * __modes) __attribute__((__nothrow__, __leaf__));
+extern FILE  *fmemopen(void  * __s, size_t  __len, const char  * __modes) __attribute__((__nothrow__, __leaf__));
+extern FILE  *open_memstream(char  * * __bufloc, size_t  * __sizeloc) __attribute__((__nothrow__, __leaf__));
+extern void setbuf(FILE  *__restrict  __stream, char  *__restrict  __buf) __attribute__((__nothrow__, __leaf__));
+extern signed int setvbuf(FILE  *__restrict  __stream, char  *__restrict  __buf, signed int  __modes, size_t  __n) __attribute__((__nothrow__, __leaf__));
+extern signed int fprintf(FILE  *__restrict  __stream, const char  *__restrict  __format, ...);
+extern signed int printf(const char  *__restrict  __format, ...);
+extern signed int sprintf(char  *__restrict  __s, const char  *__restrict  __format, ...) __attribute__((__nothrow__));
+extern signed int vfprintf(FILE  *__restrict  __s, const char  *__restrict  __format, __gnuc_va_list  __arg);
+extern signed int vprintf(const char  *__restrict  __format, __gnuc_va_list  __arg);
+extern signed int vsprintf(char  *__restrict  __s, const char  *__restrict  __format, __gnuc_va_list  __arg) __attribute__((__nothrow__));
+extern signed int snprintf(char  *__restrict  __s, size_t  __maxlen, const char  *__restrict  __format, ...) __attribute__((__nothrow__)) __attribute__((__format__(__printf__, 3, 4)));
+extern signed int vsnprintf(char  *__restrict  __s, size_t  __maxlen, const char  *__restrict  __format, __gnuc_va_list  __arg) __attribute__((__nothrow__)) __attribute__((__format__(__printf__, 3, 0)));
+extern signed int vdprintf(signed int  __fd, const char  *__restrict  __fmt, __gnuc_va_list  __arg) __attribute__((__format__(__printf__, 2, 0)));
+extern signed int dprintf(signed int  __fd, const char  *__restrict  __fmt, ...) __attribute__((__format__(__printf__, 2, 3)));
+extern signed int fscanf(FILE  *__restrict  __stream, const char  *__restrict  __format, ...);
+extern signed int scanf(const char  *__restrict  __format, ...);
+extern signed int sscanf(const char  *__restrict  __s, const char  *__restrict  __format, ...) __attribute__((__nothrow__, __leaf__));
+extern signed int fscanf(FILE  *__restrict  __stream, const char  *__restrict  __format, ...) __asm__("" "__isoc99_fscanf");
+extern signed int scanf(const char  *__restrict  __format, ...) __asm__("" "__isoc99_scanf");
+extern signed int sscanf(const char  *__restrict  __s, const char  *__restrict  __format, ...) __asm__("" "__isoc99_sscanf") __attribute__((__nothrow__, __leaf__));
+extern signed int vfscanf(FILE  *__restrict  __s, const char  *__restrict  __format, __gnuc_va_list  __arg) __attribute__((__format__(__scanf__, 2, 0)));
+extern signed int vscanf(const char  *__restrict  __format, __gnuc_va_list  __arg) __attribute__((__format__(__scanf__, 1, 0)));
+extern signed int vsscanf(const char  *__restrict  __s, const char  *__restrict  __format, __gnuc_va_list  __arg) __attribute__((__nothrow__, __leaf__)) __attribute__((__format__(__scanf__, 2, 0)));
+extern signed int vfscanf(FILE  *__restrict  __s, const char  *__restrict  __format, __gnuc_va_list  __arg) __asm__("" "__isoc99_vfscanf") __attribute__((__format__(__scanf__, 2, 0)));
+extern signed int vscanf(const char  *__restrict  __format, __gnuc_va_list  __arg) __asm__("" "__isoc99_vscanf") __attribute__((__format__(__scanf__, 1, 0)));
+extern signed int vsscanf(const char  *__restrict  __s, const char  *__restrict  __format, __gnuc_va_list  __arg) __asm__("" "__isoc99_vsscanf") __attribute__((__nothrow__, __leaf__)) __attribute__((__format__(__scanf__, 2, 0)));
+extern signed int fgetc(FILE  * __stream);
+extern signed int getc(FILE  * __stream);
+extern signed int getchar(void);
+extern signed int getc_unlocked(FILE  * __stream);
+extern signed int getchar_unlocked(void);
+extern signed int fputc(signed int  __c, FILE  * __stream);
+extern signed int putc(signed int  __c, FILE  * __stream);
+extern signed int putchar(signed int  __c);
+extern signed int putc_unlocked(signed int  __c, FILE  * __stream);
+extern signed int putchar_unlocked(signed int  __c);
+extern char  *fgets(char  *__restrict  __s, signed int  __n, FILE  *__restrict  __stream) __attribute__((__access__(__write_only__, 1, 2)));
+extern __ssize_t __getdelim(char  * *__restrict  __lineptr, size_t  *__restrict  __n, signed int  __delimiter, FILE  *__restrict  __stream);
+extern __ssize_t getdelim(char  * *__restrict  __lineptr, size_t  *__restrict  __n, signed int  __delimiter, FILE  *__restrict  __stream);
+extern __ssize_t getline(char  * *__restrict  __lineptr, size_t  *__restrict  __n, FILE  *__restrict  __stream);
+extern signed int fputs(const char  *__restrict  __s, FILE  *__restrict  __stream);
+extern signed int puts(const char  * __s);
+extern signed int ungetc(signed int  __c, FILE  * __stream);
+extern size_t fread(void  *__restrict  __ptr, size_t  __size, size_t  __n, FILE  *__restrict  __stream);
+extern size_t fwrite(const void  *__restrict  __ptr, size_t  __size, size_t  __n, FILE  *__restrict  __s);
+extern signed int fseek(FILE  * __stream, signed long  __off, signed int  __whence);
+extern signed long ftell(FILE  * __stream);
+extern void rewind(FILE  * __stream);
+extern signed int fseeko(FILE  * __stream, __off_t  __off, signed int  __whence);
+extern __off_t ftello(FILE  * __stream);
+extern signed int fgetpos(FILE  *__restrict  __stream, fpos_t  *__restrict  __pos);
+extern signed int fsetpos(FILE  * __stream, const fpos_t  * __pos);
+extern void clearerr(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern signed int feof(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern signed int ferror(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern void perror(const char  * __s);
+extern signed int fileno(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern FILE  *popen(const char  * __command, const char  * __modes);
+extern signed int pclose(FILE  * __stream);
+extern char  *ctermid(char  * __s) __attribute__((__nothrow__, __leaf__));
+extern void flockfile(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern signed int ftrylockfile(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern void funlockfile(FILE  * __stream) __attribute__((__nothrow__, __leaf__));
+extern signed int __uflow(FILE  * );
+extern signed int __overflow(FILE  * , signed int  );
 extern void  *memcpy(void  *__restrict  __dest, const void  *__restrict  __src, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
 extern void  *memmove(void  * __dest, const void  * __src, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
 extern void  *memset(void  * __s, signed int  __c, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
@@ -231,6 +502,20 @@ extern signed int strcmp(const char  * __s1, const char  * __s2) __attribute__((
 extern signed int strncmp(const char  * __s1, const char  * __s2, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1, 2)));
 extern signed int strcoll(const char  * __s1, const char  * __s2) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1, 2)));
 extern size_t strxfrm(char  *__restrict  __dest, const char  *__restrict  __src, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2))) __attribute__((__access__(__write_only__, 1, 3)));
+struct __locale_struct {
+  struct __locale_data  *__locales[13];
+  const unsigned short  *__ctype_b;
+  const signed int  *__ctype_tolower;
+  const signed int  *__ctype_toupper;
+  const char  *__names[13];
+  
+};
+typedef struct __locale_struct  *__locale_t;
+typedef __locale_t locale_t;
+extern signed int strcoll_l(const char  * __s1, const char  * __s2, locale_t  __l) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1, 2, 3)));
+extern size_t strxfrm_l(char  * __dest, const char  * __src, size_t  __n, locale_t  __l) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2, 4))) __attribute__((__access__(__write_only__, 1, 3)));
+extern char  *strdup(const char  * __s) __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__)) __attribute__((__nonnull__(1)));
+extern char  *strndup(const char  * __string, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__)) __attribute__((__nonnull__(1)));
 extern char  *strchr(const char  * __s, signed int  __c) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1)));
 extern char  *strrchr(const char  * __s, signed int  __c) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1)));
 extern size_t strcspn(const char  * __s, const char  * __reject) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1, 2)));
@@ -241,23 +526,40 @@ extern char  *strtok(char  *__restrict  __s, const char  *__restrict  __delim) _
 extern char  *__strtok_r(char  *__restrict  __s, const char  *__restrict  __delim, char  * *__restrict  __save_ptr) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2, 3)));
 extern char  *strtok_r(char  *__restrict  __s, const char  *__restrict  __delim, char  * *__restrict  __save_ptr) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2, 3)));
 extern size_t strlen(const char  * __s) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1)));
+extern size_t strnlen(const char  * __string, size_t  __maxlen) __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__)) __attribute__((__nonnull__(1)));
 extern char  *strerror(signed int  __errnum) __attribute__((__nothrow__, __leaf__));
+extern signed int strerror_r(signed int  __errnum, char  * __buf, size_t  __buflen) __asm__("" "__xpg_strerror_r") __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2))) __attribute__((__access__(__write_only__, 2, 3)));
+extern char  *strerror_l(signed int  __errnum, locale_t  __l) __attribute__((__nothrow__, __leaf__));
+extern char  *strsignal(signed int  __sig) __attribute__((__nothrow__, __leaf__));
+extern char  *__stpcpy(char  *__restrict  __dest, const char  *__restrict  __src) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+extern char  *stpcpy(char  *__restrict  __dest, const char  *__restrict  __src) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+extern char  *__stpncpy(char  *__restrict  __dest, const char  *__restrict  __src, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+extern char  *stpncpy(char  *__restrict  __dest, const char  *__restrict  __src, size_t  __n) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+typedef __useconds_t useconds_t;
 extern signed int access(const char  * __name, signed int  __type) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int faccessat(signed int  __fd, const char  * __file, signed int  __type, signed int  __flag) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
 extern __off_t lseek(signed int  __fd, __off_t  __offset, signed int  __whence) __attribute__((__nothrow__, __leaf__));
 extern signed int close(signed int  __fd);
 extern ssize_t read(signed int  __fd, void  * __buf, size_t  __nbytes) __attribute__((__access__(__write_only__, 2, 3)));
 extern ssize_t write(signed int  __fd, const void  * __buf, size_t  __n) __attribute__((__access__(__read_only__, 2, 3)));
+extern ssize_t pread(signed int  __fd, void  * __buf, size_t  __nbytes, __off_t  __offset) __attribute__((__access__(__write_only__, 2, 3)));
+extern ssize_t pwrite(signed int  __fd, const void  * __buf, size_t  __n, __off_t  __offset) __attribute__((__access__(__read_only__, 2, 3)));
 extern signed int pipe(signed int  __pipedes[2]) __attribute__((__nothrow__, __leaf__));
 extern unsigned int alarm(unsigned int  __seconds) __attribute__((__nothrow__, __leaf__));
 extern unsigned int sleep(unsigned int  __seconds);
 extern signed int pause(void);
 extern signed int chown(const char  * __file, __uid_t  __owner, __gid_t  __group) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int fchown(signed int  __fd, __uid_t  __owner, __gid_t  __group) __attribute__((__nothrow__, __leaf__));
+extern signed int lchown(const char  * __file, __uid_t  __owner, __gid_t  __group) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int fchownat(signed int  __fd, const char  * __file, __uid_t  __owner, __gid_t  __group, signed int  __flag) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
 extern signed int chdir(const char  * __path) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int fchdir(signed int  __fd) __attribute__((__nothrow__, __leaf__));
 extern char  *getcwd(char  * __buf, size_t  __size) __attribute__((__nothrow__, __leaf__));
 extern signed int dup(signed int  __fd) __attribute__((__nothrow__, __leaf__));
 extern signed int dup2(signed int  __fd, signed int  __fd2) __attribute__((__nothrow__, __leaf__));
 extern char  * *__environ;
 extern signed int execve(const char  * __path, char  *const  __argv[], char  *const  __envp[]) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+extern signed int fexecve(signed int  __fd, char  *const  __argv[], char  *const  __envp[]) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
 extern signed int execv(const char  * __path, char  *const  __argv[]) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
 extern signed int execle(const char  * __path, const char  * __arg, ...) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
 extern signed int execl(const char  * __path, const char  * __arg, ...) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
@@ -573,30 +875,52 @@ enum  {
 extern signed long pathconf(const char  * __path, signed int  __name) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 extern signed long fpathconf(signed int  __fd, signed int  __name) __attribute__((__nothrow__, __leaf__));
 extern signed long sysconf(signed int  __name) __attribute__((__nothrow__, __leaf__));
+extern size_t confstr(signed int  __name, char  * __buf, size_t  __len) __attribute__((__nothrow__, __leaf__)) __attribute__((__access__(__write_only__, 2, 3)));
 extern __pid_t getpid(void) __attribute__((__nothrow__, __leaf__));
 extern __pid_t getppid(void) __attribute__((__nothrow__, __leaf__));
 extern __pid_t getpgrp(void) __attribute__((__nothrow__, __leaf__));
 extern __pid_t __getpgid(__pid_t  __pid) __attribute__((__nothrow__, __leaf__));
+extern __pid_t getpgid(__pid_t  __pid) __attribute__((__nothrow__, __leaf__));
 extern signed int setpgid(__pid_t  __pid, __pid_t  __pgid) __attribute__((__nothrow__, __leaf__));
 extern __pid_t setsid(void) __attribute__((__nothrow__, __leaf__));
+extern __pid_t getsid(__pid_t  __pid) __attribute__((__nothrow__, __leaf__));
 extern __uid_t getuid(void) __attribute__((__nothrow__, __leaf__));
 extern __uid_t geteuid(void) __attribute__((__nothrow__, __leaf__));
 extern __gid_t getgid(void) __attribute__((__nothrow__, __leaf__));
 extern __gid_t getegid(void) __attribute__((__nothrow__, __leaf__));
 extern signed int getgroups(signed int  __size, __gid_t  __list[]) __attribute__((__nothrow__, __leaf__)) __attribute__((__access__(__write_only__, 2, 1)));
 extern signed int setuid(__uid_t  __uid) __attribute__((__nothrow__, __leaf__));
+extern signed int seteuid(__uid_t  __uid) __attribute__((__nothrow__, __leaf__));
 extern signed int setgid(__gid_t  __gid) __attribute__((__nothrow__, __leaf__));
+extern signed int setegid(__gid_t  __gid) __attribute__((__nothrow__, __leaf__));
 extern __pid_t fork(void) __attribute__((__nothrow__));
 extern char  *ttyname(signed int  __fd) __attribute__((__nothrow__, __leaf__));
 extern signed int ttyname_r(signed int  __fd, char  * __buf, size_t  __buflen) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2))) __attribute__((__access__(__write_only__, 2, 3)));
 extern signed int isatty(signed int  __fd) __attribute__((__nothrow__, __leaf__));
 extern signed int link(const char  * __from, const char  * __to) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+extern signed int linkat(signed int  __fromfd, const char  * __from, signed int  __tofd, const char  * __to, signed int  __flags) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2, 4)));
+extern signed int symlink(const char  * __from, const char  * __to) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
+extern ssize_t readlink(const char  *__restrict  __path, char  *__restrict  __buf, size_t  __len) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2))) __attribute__((__access__(__write_only__, 2, 3)));
+extern signed int symlinkat(const char  * __from, signed int  __tofd, const char  * __to) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 3)));
+extern ssize_t readlinkat(signed int  __fd, const char  *__restrict  __path, char  *__restrict  __buf, size_t  __len) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2, 3))) __attribute__((__access__(__write_only__, 3, 4)));
 extern signed int unlink(const char  * __name) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int unlinkat(signed int  __fd, const char  * __name, signed int  __flag) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
 extern signed int rmdir(const char  * __path) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 extern __pid_t tcgetpgrp(signed int  __fd) __attribute__((__nothrow__, __leaf__));
 extern signed int tcsetpgrp(signed int  __fd, __pid_t  __pgrp_id) __attribute__((__nothrow__, __leaf__));
 extern char  *getlogin(void);
+extern signed int getlogin_r(char  * __name, size_t  __name_len) __attribute__((__nonnull__(1))) __attribute__((__access__(__write_only__, 1, 2)));
+extern char  *optarg;
+extern signed int optind;
+extern signed int opterr;
+extern signed int optopt;
+extern signed int getopt(signed int  ___argc, char  *const  * ___argv, const char  * __shortopts) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2, 3)));
+extern signed int getopt(signed int  ___argc, char  *const  * ___argv, const char  * __shortopts) __asm__("" "__posix_getopt") __attribute__((__nothrow__, __leaf__));
+extern signed int gethostname(char  * __name, size_t  __len) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1))) __attribute__((__access__(__write_only__, 1, 2)));
 extern signed int fsync(signed int  __fd);
+extern signed int truncate(const char  * __file, __off_t  __length) __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern signed int ftruncate(signed int  __fd, __off_t  __length) __attribute__((__nothrow__, __leaf__));
+extern signed int fdatasync(signed int  __fildes);
 static _Bool  safemult_sizet(size_t  a, size_t  b, size_t  * res)
 {
 
@@ -781,7 +1105,19 @@ _Bool  array_cat0_temporary(array  * a)
 
   ;
   {
-    char  *endpos = ((array_alloc)((a), 1, ((((a))->used))));
+    char  *endpos = ((char *)({
+      void  *_tmp10 = ((array_alloc)((a), 1, ((((a))->used))));
+      ({
+        if (((_tmp10) == 0))
+        {
+          ((fprintf)((stderr), "array.xc:202:25:ERROR: attempted cast of NULL to nonnull\\n"));
+          ((exit)(255));
+        } else {
+          ;
+        }
+        (_tmp10); })
+      ; })
+    );
     if ((!(endpos)))
     {
       return 0;

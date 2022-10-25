@@ -28,6 +28,10 @@ ngircd.dest
 .vscode
 *.a
 *.o
+*.i
+*.jar
+*.xml
+*.gen_cpp
 doc/sample-ngircd.conf
 doc/src/html
 man/ngircd.8

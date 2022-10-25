@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -30,9 +31,8 @@
 
 #define array_UNUSABLE(x)	( !(x)->mem )
 
-
 static bool
-safemult_sizet(size_t a, size_t b, size_t *res)
+safemult_sizet(size_t a, size_t b, size_t * nonnull res)
 {
 	size_t tmp = a * b;
 
@@ -45,7 +45,7 @@ safemult_sizet(size_t a, size_t b, size_t *res)
 
 
 void
-array_init(array *a)
+array_init(array * nonnull a)
 {
 	assert(a != NULL);
 	a->mem = NULL;
@@ -56,7 +56,7 @@ array_init(array *a)
 
 /* if realloc() fails, array_alloc return NULL. otherwise return pointer to elem pos in array */
 void *
-array_alloc(array * a, size_t size, size_t pos)
+array_alloc(array * nonnull a, size_t size, size_t pos)
 {
 	size_t alloc, pos_plus1 = pos + 1;
 	char *tmp;
@@ -89,7 +89,7 @@ array_alloc(array * a, size_t size, size_t pos)
 
 /*return number of initialized ELEMS in a. */
 size_t
-array_length(const array * const a, size_t membersize)
+array_length(const array * nonnull const a, size_t membersize)
 {
 	assert(a != NULL);
 	assert(membersize > 0);
@@ -104,7 +104,7 @@ array_length(const array * const a, size_t membersize)
 
 /* copy array src to array dest */
 bool
-array_copy(array * dest, const array * const src)
+array_copy(array * nonnull dest, const array * nonnull const src)
 {
 	if (array_UNUSABLE(src))
 		return false;
@@ -116,7 +116,7 @@ array_copy(array * dest, const array * const src)
 
 /* return false on failure (realloc failure, invalid src/dest array) */
 bool
-array_copyb(array * dest, const char *src, size_t len)
+array_copyb(array * nonnull dest, const char * nonnull src, size_t len)
 {
 	assert(dest != NULL);
 	assert(src != NULL );
@@ -131,7 +131,7 @@ array_copyb(array * dest, const char *src, size_t len)
 
 /* copy string to dest */
 bool
-array_copys(array * dest, const char *src)
+array_copys(array * nonnull dest, const char * nonnull src)
 {
 	return array_copyb(dest, src, strlen(src));
 }
@@ -140,7 +140,7 @@ array_copys(array * dest, const char *src)
 /* append len bytes from src to the array dest.
 return false if we could not append all bytes (realloc failure, invalid src/dest array) */
 bool
-array_catb(array * dest, const char *src, size_t len)
+array_catb(array * nonnull dest, const char * src, size_t len)
 {
 	size_t tmp;
 	size_t used;
@@ -181,7 +181,7 @@ array_catb(array * dest, const char *src, size_t len)
 
 /* append string to dest */
 bool
-array_cats(array * dest, const char *src)
+array_cats(array * nonnull dest, const char * nonnull src)
 {
 	return array_catb(dest, src, strlen(src));
 }
@@ -189,7 +189,7 @@ array_cats(array * dest, const char *src)
 
 /* append trailing NUL byte to array */
 bool
-array_cat0(array * a)
+array_cat0(array * nonnull a)
 {
 	return array_catb(a, "", 1);
 }
@@ -197,9 +197,9 @@ array_cat0(array * a)
 
 /* append trailing NUL byte to array, but do not count it. */
 bool
-array_cat0_temporary(array * a)
+array_cat0_temporary(array * nonnull a)
 {
-	char *endpos = array_alloc(a, 1, array_bytes(a));
+	char * nonnull endpos = (char * nonnull) array_alloc(a, 1, array_bytes(a));
 	if (!endpos)
 		return false;
 
@@ -209,7 +209,7 @@ array_cat0_temporary(array * a)
 
 /* add contents of array src to array dest. */
 bool
-array_cat(array * dest, const array * const src)
+array_cat(array * nonnull dest, const array * nonnull const src)
 {
 	if (array_UNUSABLE(src))
 		return false;
@@ -222,7 +222,7 @@ array_cat(array * dest, const array * const src)
    return NULL if the array is unallocated, or if pos is larger than
    the number of elements stored int the array. */
 void *
-array_get(array * a, size_t membersize, size_t pos)
+array_get(array * nonnull a, size_t membersize, size_t pos)
 {
 	size_t totalsize;
 	size_t posplus1 = pos + 1;
@@ -245,7 +245,7 @@ array_get(array * a, size_t membersize, size_t pos)
 
 
 void
-array_free(array * a)
+array_free(array * nonnull a)
 {
 	assert(a != NULL);
 #if DEBUG_ARRAY
@@ -260,7 +260,7 @@ array_free(array * a)
 }
 
 void
-array_free_wipe(array *a)
+array_free_wipe(array * nonnull a)
 {
 	size_t bytes = a->allocated;
 	if (bytes)
@@ -269,7 +269,7 @@ array_free_wipe(array *a)
 }
 
 void *
-array_start(const array * const a)
+array_start(const array * nonnull const a)
 {
 	assert(a != NULL);
 	return a->mem;
@@ -277,7 +277,7 @@ array_start(const array * const a)
 
 
 void
-array_trunc(array * a)
+array_trunc(array * nonnull a)
 {
 	assert(a != NULL);
 	a->used = 0;
@@ -285,7 +285,7 @@ array_trunc(array * a)
 
 
 void
-array_truncate(array * a, size_t membersize, size_t len)
+array_truncate(array * nonnull a, size_t membersize, size_t len)
 {
 	size_t newlen;
 	assert(a != NULL);
@@ -299,7 +299,7 @@ array_truncate(array * a, size_t membersize, size_t len)
 
 /* move elements starting at pos to beginning of array */
 void
-array_moveleft(array * a, size_t membersize, size_t pos)
+array_moveleft(array * nonnull a, size_t membersize, size_t pos)
 {
 	size_t bytepos;
 
