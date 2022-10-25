@@ -1,4 +1,4 @@
-/*
+ /*
  * ngIRCd -- The Next Generation IRC Daemon
  * Copyright (c)2001-2014 Alexander Barton (alex@barton.de) and Contributors.
  *

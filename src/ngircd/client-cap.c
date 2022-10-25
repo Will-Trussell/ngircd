@@ -26,7 +26,7 @@
 #include "client-cap.h"
 
 GLOBAL int
-Client_Cap(CLIENT *Client)
+Client_Cap(CLIENT * Client)
 {
 	assert (Client != NULL);
 
@@ -34,7 +34,7 @@ Client_Cap(CLIENT *Client)
 }
 
 GLOBAL void
-Client_CapSet(CLIENT *Client, int Cap)
+Client_CapSet(CLIENT * Client, int Cap)
 {
 	assert(Client != NULL);
 	assert(Cap >= 0);
@@ -45,7 +45,7 @@ Client_CapSet(CLIENT *Client, int Cap)
 }
 
 GLOBAL void
-Client_CapAdd(CLIENT *Client, int Cap)
+Client_CapAdd(CLIENT * Client, int Cap)
 {
 	assert(Client != NULL);
 	assert(Cap > 0);
@@ -56,7 +56,7 @@ Client_CapAdd(CLIENT *Client, int Cap)
 }
 
 GLOBAL void
-Client_CapDel(CLIENT *Client, int Cap)
+Client_CapDel(CLIENT * Client, int Cap)
 {
 	assert(Client != NULL);
 	assert(Cap > 0);
