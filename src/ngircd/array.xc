@@ -47,7 +47,6 @@ safemult_sizet(size_t a, size_t b, size_t * nonnull res)
 void
 array_init(array * nonnull a)
 {
-	assert(a != NULL);
 	a->mem = NULL;
 	a->allocated = 0;
 	a->used = 0;
@@ -91,7 +90,6 @@ array_alloc(array * nonnull a, size_t size, size_t pos)
 size_t
 array_length(const array * nonnull const a, size_t membersize)
 {
-	assert(a != NULL);
 	assert(membersize > 0);
 
 	if (array_UNUSABLE(a))
@@ -118,9 +116,6 @@ array_copy(array * nonnull dest, const array * nonnull const src)
 bool
 array_copyb(array * nonnull dest, const char * nonnull src, size_t len)
 {
-	assert(dest != NULL);
-	assert(src != NULL );
-
 	if (!src || !dest)
 		return false;
 
@@ -145,9 +140,6 @@ array_catb(array * nonnull dest, const char * src, size_t len)
 	size_t tmp;
 	size_t used;
 	char *ptr;
-
-	assert(dest != NULL);
-	assert(src != NULL);
 
 	if (!len)
 		return true;
@@ -228,7 +220,6 @@ array_get(array * nonnull a, size_t membersize, size_t pos)
 	size_t posplus1 = pos + 1;
 
 	assert(membersize > 0);
-	assert(a != NULL);
 
 	if (!posplus1 || array_UNUSABLE(a))
 		return NULL;
@@ -247,7 +238,6 @@ array_get(array * nonnull a, size_t membersize, size_t pos)
 void
 array_free(array * nonnull a)
 {
-	assert(a != NULL);
 #if DEBUG_ARRAY
 	Log(LOG_DEBUG,
 	    "array_free(): %u bytes free'd (%u bytes still used at time of free()).",
@@ -271,7 +261,6 @@ array_free_wipe(array * nonnull a)
 void *
 array_start(const array * nonnull const a)
 {
-	assert(a != NULL);
 	return a->mem;
 }
 
@@ -279,7 +268,6 @@ array_start(const array * nonnull const a)
 void
 array_trunc(array * nonnull a)
 {
-	assert(a != NULL);
 	a->used = 0;
 }
 
@@ -288,7 +276,6 @@ void
 array_truncate(array * nonnull a, size_t membersize, size_t len)
 {
 	size_t newlen;
-	assert(a != NULL);
 	if (!safemult_sizet(membersize, len, &newlen))
 		return;
 
@@ -303,7 +290,6 @@ array_moveleft(array * nonnull a, size_t membersize, size_t pos)
 {
 	size_t bytepos;
 
-	assert(a != NULL);
 	assert(membersize > 0);
 
 	if (!safemult_sizet(membersize, pos, &bytepos)) {
