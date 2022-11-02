@@ -1,7 +1,7 @@
 Notes on where to look for various extensions
- - For nonnull, examine array.xc file
- - For Asynchronous I/O, examine io.xc (WIP)
- - For parsing, examine parse.xc (WIP)
+ - For nonnull, examine src/ngircd/array.xc file
+ - For Asynchronous I/O, examine src/ngircd/io.xc (WIP)
+ - For parsing, examine src/ngircd/parse.xc (WIP)
 
 Track progress here
 
