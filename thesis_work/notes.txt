@@ -1,0 +1,10 @@
+Notes on where to look for various extensions
+ - For nonnull, examine array.xc file
+ - For Asynchronous I/O, examine io.xc (WIP)
+ - For parsing, examine parse.xc (WIP)
+
+Track progress here
+
+Ideas/Thoughts
+
+Any issues encountered?
