@@ -1,0 +1,31 @@
+Notes on what writing looks like for today:
+
+Rationale for why to use Wuffs extension:
+Servers want combo of high performance and high security,which means running 
+software as efficiently as possible, while also ensuring all software run on a 
+server is secure. C code would be a good choice for efficient, high-performance
+code. Unfortunately, there is very little security provided by default in the C
+language, meaning programmers must do a lot of work on their own to ensure no
+malicious attacks are successful. The Wuffs language {cite Wuffs repo here},
+created by Google, offers one solution to the lack of security in C by giving
+programmers a memory-safe language for parsing various file formats.
+
+Wuffs itself is automatically safe against buffer overflows, integer arithmetic
+overflows, and null pointer dereferences. This gives it many advantages over raw
+C code straight out of the box.
+
+An IRC server, however, is parsing mainly text, trying to determine what the
+requested command is, then attaching parameters and executing the command on the
+server. We desire to take the niceties of the Wuffs language (avoiding null
+pointer dereference, as well as buffer overflows), and implement them in an
+extension to provide these same benefits in AbleC, without needing to utilize
+the entire Wuffs library.
+
+/\/\/\/\/\/\/\/\/\/\/\/\
+Probably here I want to include some tidbits comparing the old parse code (need
+to modify it slightly to remove some preprocessor directives and such) to
+whatever the extension ends up finally looking like. Discussion of the specific
+differences will follow this, as well as an examination of the specific
+extension. What does it do, specifically? There was some discussion of benefits
+above, but I can likely discuss more concretely the benefits here.
+\/\/\/\/\/\/\/\/\/\/\/\/
