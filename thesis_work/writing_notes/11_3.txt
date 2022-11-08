@@ -1,0 +1,22 @@
+- Began work on writing an introduction to the paper
+- Also looked at beginning steps of how to write an extension in ableC.
+  Discovered several interesting tidbits from both ableC-skeleton and ableC root
+  repository. 
+- Questions:
+    - Is there any easy reference for what ableC expressions exist? I.E., I have
+      found some like exprStmt and such, but when digging through the ableC
+      repository, these constructs just lead to other constructs, and there
+      doesn't seem to be a good reference anywhere that I can find
+    - If there isn't a good reference, which parts are the most important? It
+      seems that directCallExpr is useful when issuing syscalls, and callExpr
+      seems that it would be useful if making calls to custom written functions
+      (for instance in the asynchronous extension). Both of these constructs
+      take some Exprs argument, and I haven't been able to find reference to
+      that. The skeleton extension uses a consExpr construct, but again, I am
+      unable to find anything referencing this online.
+    - I'm assuming that the cat() function/construct simply concatenates two
+      other things together?
+    - Constructs like comma(), space(), semi(), etc seem to be referencing
+      simply things like ",", " ", or ";". Is this correct? They are just
+      productions that give a pp attribute of whatever string they're associated
+      with?
