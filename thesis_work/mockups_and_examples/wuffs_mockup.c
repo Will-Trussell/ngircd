@@ -109,39 +109,87 @@ Parse_Request( CONN_ID Idx, char *Request )
 	return Handle_Request(Idx, &req);
 } /* Parse_Request - Old */
 
-//Below is what the ideal new extension would look like, using concepts from
-//Wuffs for better parsing than raw C provides
-bool Parse_Request (CONN_ID Idx, char *Request) {
-    //Asserts here for checking for nonnulls
-    REQUEST req;
-    Init_Request(&req);
+// Wuffs code here for building the parser:
+WUFFS {
+    pub struct parser?(
+        //Prefix if it exists
+        prefix: slice base.u8,
 
-    char c = read_char(Request);
-    if (c==0)
-        // Fail, Request is empty?
-        return false;
-    if (c==':'){
-        //Handle prefix
-    }
-    while (1) {
-        c = read_char(Request);
-        if (c == 0){
-            return true;
+        //Enumerate the commands, each one gets some number from 0 to 55
+        cmd : base.u32[..= 56],
+       
+        // args is a 15 element array of byte slices (essentially array of
+        // pointers)
+        args : array[15] slice base.u8,
+
+        argc : base.u32[..=15] // The number of arguments
+    )
+    
+    pub func parser.parse?(src: base.io_reader) {
+        var c : base.u8
+        var i : base.u32[..15]
+        var s : slice base.u8
+        this.argc = 0 //Set argc to 0, we will count number of args later
+        c = args.src.read_u8?()
+        if c = ' ' {
+            while true {
+                c = args.src.read_u8?()
+                if c <> ' ' {
+                    break
+                }
+            }
+
+        if c == ':' { //Not actual string comparison, Wuffs doesn't do strings
+            //Handle prefix here
+            // Need some way of copying next few letters into this.prefix
+            // Not sure exactly what the syntax is, need to look into docs
+            // Want to slice from next byte until a space is input
+            this.prefix = args.src.read_u8?().slice_until(' ')
+            this.cmd = args.src.slice_until(' ')
         }
-        if (c == ':'){
-            //Handle prefix
+        else {
+            // Not a prefix, figure out what command it is, assign to this.cmd
+            // Can leave this.prefix as default initialization (0 or null)
+            this.cmd = args.src.slice_until(' ')
         }
-
+        while true {
+            s = args.src.slice_until(' ')
+            if s == 0 { //Null byte, finished
+                return ok
+            }
+            else {
+                this.args[i] = s
+                this.argc += 1
+                if i < 14 {
+                    i = i+1
+                }
+                else {
+                    // Can't have i outside bounds of array
+                    // If i == 14, we have filled all 15 args of the struct and
+                    // we can return having filled the fields
+                    return ok
+                }
+            }
+        } endwhile
     }
-}
+} WUFFS_END
 
 
-
-
-
-
-
-
-
-
-
+// Wuffs extension:
+// Shovel code to Wuffs compiler
+// Take generated C code, put it back into file in same location
+//
+// Note the above example code. This builds a basic parser with fields
+// corresponding to the fields in our Command struct (NGIRCd)
+// We begin by removing any leading space characters (optional, may just ignore
+// this depending on time crunch) then read in a character. If the character
+// indicates we are dealing with a prefix, then we handle the prefix. We must
+// get the full prefix, which involves getting all the bytes until we find
+// another space (' '), at which point we assign that string (slice in Wuffs) to
+// the this.prefix field. We then assign the next set of bytes until a space to
+// the this.command field. If there is no prefix, we simply leave the prefix
+// field blank and fill in the command field. Then, we move on to populating the
+// arguments. We add each argument as a slice. Note that this parse coroutine
+// does not return anything. We instead are utilizing the Wuffs compiler to
+// generate parse code we know is checked safe at compile time, which then
+// populates our REQUEST struct. 

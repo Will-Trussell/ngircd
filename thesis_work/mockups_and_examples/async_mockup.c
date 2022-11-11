@@ -36,6 +36,14 @@ await first_task[8]
 
 
 
-//New Syntax (for 11/1 meeting)
+//New Syntax
 closure <() -> void> f = lambda () -> void { /*Code here*/}
 spawn f // Translate down to task_spawn(f)
+
+// Translation of functions from io.c to nathan's functions
+// io_event_change_epoll -> task_yield_for_io 
+// io_dispatch_epoll     -> idle_task ?
+// io_library_init_epoll -> executor_new (approximately)
+//
+// Not perfect translations for some IO functions, but the above are close-ish
+// translations
