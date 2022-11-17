@@ -11,6 +11,12 @@ top::Stmt ::= wuffs_code::String
 function wuffs_compiled
 Stmt ::= wuffs_code::String
 {
+    --From Silver docs
+    writeFile("parse.wuffs", wuffs_code, ioin);
+    
+    -- Now need some way of calling out to makefile in this case?
+    -- Again from Silver docs:
+    system("wuffs parse.wuffs", ioin);
     {- 
       Need some way to load the provided Wuffs code into a separate file
       Process is as follows:

@@ -40,6 +40,11 @@ await first_task[8]
 closure <() -> void> f = lambda () -> void { /*Code here*/}
 spawn f // Translate down to task_spawn(f)
 
+spawn { /*code here*/ } -> task_spawn( lambda () -> {/* code here */} );
+
+int task1 = spawn {...}
+await task1 -> wait_helper_func(task1) //Waits for info from pipe/eventfd, then
+                                       //closes when done reading
 // Translation of functions from io.c to nathan's functions
 // io_event_change_epoll -> task_yield_for_io 
 // io_dispatch_epoll     -> idle_task ?

@@ -172,9 +172,74 @@ Parse_GetCommandStruct( void )
  * @return CONNECTED on success (valid command or "regular" error), DISCONNECTED
  *	if a fatal error occurred and the connection has been shut down.
  */
+
 GLOBAL bool
 Parse_Request( CONN_ID Idx, char *Request )
 {
+    WUFFS
+        pub struct parser?(
+            //Prefix, if it exists
+            prefix: slice base.u8,
+
+            //Enumeration of commands
+            cmd : base.u32[..=56],
+
+            //15 element array of byte slices (array of pointers)
+            args : array[15] slice base.u8,
+
+            //Count of total number of args
+            argc : base.u32[..=15]
+        )
+        
+        //Should this be a coroutine? Unsure
+        pub func parser.parse?(src: base.io_reader) {
+            var c : base.u8
+            var i : base.u32[..15]
+            var s : slice base.u8
+            this.argc = 0 //Set to 0 at beginning, count args later
+            c = args.src.read_u8?()
+            if c == ' ' {
+                while true {
+                    c = args.src.read_u8?()
+                    if c <> ' ' {
+                        break
+                    }
+                }endwhile
+
+                if c == ':' {
+                    // Need some way of reading until some character
+                    this.prefix = args.src.read_u8?()
+                    this.cmd = args.src.slice_until(' ')
+                }
+                else {
+                    //Not a prefix, figure out what command is
+
+                    this.cmd = args.src.slice_until(' ')
+                }
+                while true {
+                    s = args.src.slice_until(' ')
+                    if s == 0 {
+                    //Null byte, we are done
+                        return ok
+                    }
+                    else{
+                        this.args[i] = s
+                        this.argc += 1
+                        if i < 14 {
+                            i += 1
+                        }
+                        else {
+                            // Can't have i outside bounds of array
+                            // If i == 14, we've filled all 15 args, so we can
+                            // return having filled all the fields
+                            return ok
+                        }
+                    }
+                }endwhile
+            }
+        }
+    WUFFS_END
+/*
 	REQUEST req;
 	char *start, *ptr;
 	bool closed;
@@ -188,14 +253,14 @@ Parse_Request( CONN_ID Idx, char *Request )
 
 	Init_Request( &req );
 
-	/* remove leading & trailing whitespace */
+	// remove leading & trailing whitespace
 	ngt_TrimStr( Request );
 
 	if (Conf_ScrubCTCP && ScrubCTCP(Request))
 		return true;
 
 	if (Request[0] == ':') {
-		/* Prefix */
+		// Prefix
 		req.prefix = Request + 1;
 		ptr = strchr( Request, ' ' );
 		if( ! ptr )
@@ -205,7 +270,7 @@ Parse_Request( CONN_ID Idx, char *Request )
 		}
 		*ptr = '\0';
 #ifndef STRICT_RFC
-		/* ignore multiple spaces between prefix and command */
+		// ignore multiple spaces between prefix and command 
 		while( *(ptr + 1) == ' ' ) ptr++;
 #endif
 		start = ptr + 1;
@@ -217,13 +282,13 @@ Parse_Request( CONN_ID Idx, char *Request )
 	{
 		*ptr = '\0';
 #ifndef STRICT_RFC
-		/* ignore multiple spaces between parameters */
+		// ignore multiple spaces between parameters 
 		while( *(ptr + 1) == ' ' ) ptr++;
 #endif
 	}
 	req.command = start;
 
-	/* Arguments, Parameters */
+	// Arguments, Parameters 
 	if( ptr )
 	{
 		start = ptr + 1;
@@ -265,7 +330,8 @@ Parse_Request( CONN_ID Idx, char *Request )
 		return !closed;
 
 	return Handle_Request(Idx, &req);
-} /* Parse_Request */
+*/
+} // Parse_Request
 
 
 /**
