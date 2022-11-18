@@ -128,11 +128,12 @@ WUFFS {
     pub func parser.parse?(src: base.io_reader) {
         var c : base.u8
         var i : base.u32[..15]
-        var s : slice base.u8
+        var extra : base.u32
+        var sl : slice base.u8
         this.argc = 0 //Set argc to 0, we will count number of args later
         c = args.src.read_u8?()
         if c = ' ' {
-            while true {
+            while true {//Read all leading white spaces, ignore
                 c = args.src.read_u8?()
                 if c <> ' ' {
                     break
@@ -144,7 +145,8 @@ WUFFS {
             // Need some way of copying next few letters into this.prefix
             // Not sure exactly what the syntax is, need to look into docs
             // Want to slice from next byte until a space is input
-            this.prefix = args.src.read_u8?().slice_until(' ')
+            extra = args.src.limited_copy_u32_to_slice!(upto: ' ' as base.u32, s: sl)
+            this.prefix = s
             this.cmd = args.src.slice_until(' ')
         }
         else {

@@ -23,14 +23,26 @@ top::Stmt_c ::= 'WUFFS' bodyAndEnd::WuffsBodyAndEnd_t
 
 }
 
-
+-- Unsure if we want to pull code back into original c file or if we instead
+-- want to leave it as separate helper file, including that in parse_helper.c
+-- If left separate, would involve injecting some code into parse.c (not much)
+-- Injection would be as follows:
+{- 
+    insert some PARSE_REQUEST function
+    Inside that function, include several things:
+        initialization of wuffs_parser__parser
+        call to wuffs_parser__parser__parse()
+            Pass as args to this the parser and the char * input buffer
+        Calls to wuffs_parser__parser__get_prefix/cmd/args/argc
+            These values then get passed to the VALIDATE functions already in parse.c
+-}
 function compile_wuffs
 IO<String> ::= wuffs_code::String
 {
     return do {
         write_file("parse.wuffs", wuffs_code);
 
-        system("wuffs parse.wuffs");
+        system("wuffs-c gen -parser_name parser < parse.wuffs > parse_helper.c");
 
         read_file("output_wuffs.c);
     }

@@ -1,0 +1,53 @@
+We will compile the wuffs file using:
+
+    $ wuffs-c gen -package_name PKG_NAME < WUFFS_FILE > TARGET_FILE
+
+This compiles the code in WUFFS_FILE into TARGET_FILE. Materials from
+this file can be accessed with wuffs_PKGNAME__WUFFSFILE__METHODNAME.
+Essentially, given a package, struct, and method, the way of accessing this in C
+code is wuffs_<package name>__<struct name>__<method name> ()
+
+From herein in this file, we assume a package `foo` with struct `bar`.
+
+1. Every struct has an implicit initialize() method (wuffs_foo__bar__initialize)
+    This would look like the following:
+BEGIN C CODE
+
+//Initialize struct
+wuffs_foo__bar new_struct;
+
+//Variable to hold the status of initialize() (i.e. success or failure)
+wuffs_base__status status;
+
+status = 
+    wuffs_foo__bar__initialize( &new_struct,sizeof__wuffs_foo__bar,
+                                WUFFS_VERSION, 0);
+
+//alternatively, can also do this
+wuffs_foo__bar * new_struct = wuffs_foo__bar__alloc();
+if ( !new_struct ) {
+    //out of memory
+    return 0;
+}
+// If doing this, must also free(parser) before ending the program
+
+
+//To access results of parsing do the following:
+//Consider the wuffs-parse.c file from /hello-wuffs-c
+//We have an input of type char * p, size_t n
+
+//We set up the input iobuf as follows:
+wuffs_base__io_buffer iobuf =
+    wuffs_base__ptr_u8__reader( (uint8_t*)p, n, true);
+
+//Now parse, checking status when finished:
+status = wuffs_demo__parser__parse(&parser, &iobuf);
+if (!wuffs_base__status__is_ok(&status)) {
+    //Print out wuffs_base__status__message here, fail
+    return 0;
+}
+//Return was ok, now return value from parsing
+return wuffs_demo__parser__value(&parser);
+//This is of type wuffs_base__status
+// ? 
+END C CODE

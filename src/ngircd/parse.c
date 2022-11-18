@@ -172,7 +172,8 @@ Parse_GetCommandStruct( void )
  * @return CONNECTED on success (valid command or "regular" error), DISCONNECTED
  *	if a fatal error occurred and the connection has been shut down.
  */
-
+//Check this over in the morning. I think it's correct, but probably should be
+//checked by someone not writing code at 2AM. 
 GLOBAL bool
 Parse_Request( CONN_ID Idx, char *Request )
 {
@@ -182,7 +183,7 @@ Parse_Request( CONN_ID Idx, char *Request )
             prefix: slice base.u8,
 
             //Enumeration of commands
-            cmd : base.u32[..=56],
+            cmd : slice base.u8,
 
             //15 element array of byte slices (array of pointers)
             args : array[15] slice base.u8,
@@ -193,11 +194,15 @@ Parse_Request( CONN_ID Idx, char *Request )
         
         //Should this be a coroutine? Unsure
         pub func parser.parse?(src: base.io_reader) {
+            //Variable declarations
             var c : base.u8
-            var i : base.u32[..15]
-            var s : slice base.u8
+            var i : base.u32[..15] = 0 //Will be set to argc at the end
+            var extra : base.u32 //Used to track length of slices and other info
             this.argc = 0 //Set to 0 at beginning, count args later
+
             c = args.src.read_u8?()
+
+            //Strip leading whitespace
             if c == ' ' {
                 while true {
                     c = args.src.read_u8?()
@@ -205,39 +210,113 @@ Parse_Request( CONN_ID Idx, char *Request )
                         break
                     }
                 }endwhile
+            }
 
-                if c == ':' {
-                    // Need some way of reading until some character
-                    this.prefix = args.src.read_u8?()
-                    this.cmd = args.src.slice_until(' ')
-                }
-                else {
-                    //Not a prefix, figure out what command is
-
-                    this.cmd = args.src.slice_until(' ')
-                }
+            //Check for prefix, if there, handle it
+            if c == ':' {
+                //Will probably need another internal loop here, maybe doing
+                //something count number of non-space characters, then call the
+                //builtin method:
+                //io_reader.limited_copy_u32_to_slice!(up_to: u32, s:slice u8)
+                //
+                //This should copy that number of characters into some slice. I
+                //think it's valid to copy directly to this.prefix?
+                extra = 0
                 while true {
-                    s = args.src.slice_until(' ')
-                    if s == 0 {
-                    //Null byte, we are done
-                        return ok
+                    c = args.src.read_u8?()
+                    if c == ' ' {
+                        //Copy to slice here
+                        args.src.limited_copy_u32_to_slice!(up_to: extra, s: this.prefix)
+                        break 
+                    }
+                    else {
+                        extra += 1
+                    }
+                }endwhile
+
+                c = args.src.read_u8?() //Prep for reading command
+            }
+
+            //Handle command
+            else {
+                //No prefix, we need to determine what the command is
+                //Again, probably want to loop until I find a space, then copy
+                //that many into the this.cmd field
+                extra = 1 //Set to 1 because we've already read in 1 char into
+                          //whatever command was provided
+                while true {
+                    c = args.src.read_u8?()
+                    if c == ' ' {
+                        //Copy to slice
+                        args.src.limited_copy_u32_to_slice!(up_to: extra, s: this.cmd)
+                        break
                     }
                     else{
-                        this.args[i] = s
-                        this.argc += 1
-                        if i < 14 {
-                            i += 1
-                        }
-                        else {
-                            // Can't have i outside bounds of array
-                            // If i == 14, we've filled all 15 args, so we can
-                            // return having filled all the fields
-                            return ok
-                        }
+                        extra += 1
                     }
                 }endwhile
             }
+
+            //Handle args
+                //Here, we want to do the following:
+                //Read in chars until we see a space or null char
+                //Load that many into some slice, load that slice into argv
+                //Increment argc to count total number of args
+                //If argc >= 15, we are done (maxed out arg count)
+            c = args.src.read_u8?()
+            if c == 0{ //No more args, we are okay
+                return
+            }
+            if c == ' '{
+                while true {
+                    c = args.src.read_u8?()
+                    if c <> ' ' {
+                        break
+                    }
+                }
+            }
+            else{ //At least one arg
+                extra = 1 //Already read in 1 char from args
+                while.loop1 true {
+                    while.loop2 true {
+                        c = args.src.read_u8?()
+                        if c == 0 {
+                            break.loop1 // C is null, we are finished with
+                                        // parsing, 
+                        }
+                        if c == ' ' {
+                            args.src.limited_copy_u32_to_slice!(up_to: extra, s: this.args[i])
+                            extra = 0
+                            i += 1
+                            if i >= 14{
+                                //Reached max arg count
+                                break.loop1
+                            }
+                            else{
+                                break.loop2
+                            }
+                        }
+                        else{
+                            extra += 1
+                        }
+                    }endwhile.loop2
+                }endwhile.loop1
+                this.argc = i+1
+            }
         }
+        pub func parser.get_prefix() slice base.u8{
+            return this.prefix
+        }
+        pub func parser.get_cmd() slice base.u8{
+            return this.cmd
+        }
+        pub func parser.get_args() array[15] slice base.u8 {
+            return this.args
+        }
+        pub func parser.get_argc() base.u32[..15] {
+            return this.argc
+        }
+        
     WUFFS_END
 /*
 	REQUEST req;
