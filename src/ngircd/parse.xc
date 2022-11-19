@@ -46,6 +46,10 @@
 #include "irc-write.h"
 #include "numeric.h"
 
+#define WUFFS_CONFIG__MODULE__BASE
+#define WUFFS_IMPLEMENTATION
+#include "./parse_helper.c"
+
 struct _NUMERIC {
 	int numeric;
 	bool (*function) PARAMS(( CLIENT *Client, REQUEST *Request ));
